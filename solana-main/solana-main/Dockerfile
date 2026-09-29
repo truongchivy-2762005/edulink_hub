@@ -39,5 +39,5 @@ RUN chmod -R 777 storage bootstrap/cache
 # Expose Render default port
 EXPOSE 10000
 
-# Start command
-CMD php artisan config:clear && php artisan migrate --force && php artisan db:seed --force && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
+# Start command (skip db:seed to prevent duplicate entry errors)
+CMD php artisan config:clear && php artisan cache:clear && php artisan migrate --force && php artisan serve --host=0.0.0.0 --port=${PORT:-10000}
