@@ -1,20 +1,26 @@
 <?php
 
-$origins = array_filter(array_map('trim', explode(',', env('FRONTEND_URLS', env('FRONTEND_URL', 'http://localhost:3000')))));
+$configuredOrigins = array_filter(array_map('trim', explode(',', env('FRONTEND_URLS', env('FRONTEND_URL', '')))));
 
-// Preserve the existing frontend origin while enabling this repo's Next.js dev server.
-// Production uses only the explicitly configured origins.
-if (in_array(env('APP_ENV'), ['local', 'testing'], true)) {
-    $origins = array_merge($origins, ['http://localhost:3000', 'http://127.0.0.1:3000']);
-}
+$defaultOrigins = [
+    'http://localhost:3000',
+    'http://127.0.0.1:3000',
+];
+
+$origins = array_values(array_unique(array_merge($defaultOrigins, $configuredOrigins)));
 
 return [
-    'paths' => ['api/*', 'sanctum/csrf-cookie'],
+    'paths' => ['api/*', 'sanctum/csrf-cookie', '*'],
     'allowed_methods' => ['*'],
-    'allowed_origins' => array_values(array_unique($origins)),
-    'allowed_origins_patterns' => [],
+    'allowed_origins' => count($configuredOrigins) > 0 ? $origins : ['*'],
+    'allowed_origins_patterns' => [
+        '#^https?://.*\.vercel\.app$#',
+        '#^https?://.*\.onrender\.com$#',
+        '#^https?://localhost(:[0-9]+)?$#',
+        '#^https?://127\.0\.0\.1(:[0-9]+)?$#',
+    ],
     'allowed_headers' => ['*'],
-    'exposed_headers' => ['Content-Disposition'],
+    'exposed_headers' => ['Content-Disposition', 'Authorization'],
     'max_age' => 0,
     'supports_credentials' => true,
 ];
