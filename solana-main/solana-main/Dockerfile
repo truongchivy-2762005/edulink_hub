@@ -1,4 +1,4 @@
-FROM php:8.2-cli
+FROM php:8.3-cli
 
 # Install system dependencies & PHP extensions
 RUN apt-get update && apt-get install -y \
@@ -30,8 +30,8 @@ RUN if [ -f "composer.json" ]; then \
         cp -r "solana-main/solana-main/EduLink Hub/"* ./ && cp -r "solana-main/solana-main/EduLink Hub/".* ./ 2>/dev/null || true; \
     fi
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies with --ignore-platform-reqs for Laravel 12 compatibility
+RUN composer install --no-dev --optimize-autoloader --ignore-platform-reqs
 
 # Set permissions for Laravel
 RUN chmod -R 777 storage bootstrap/cache
